@@ -1,8 +1,11 @@
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from './services/supabase'
 
 export default function Auth() {
+  const navigate = useNavigate()
+
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,27 +19,33 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
           password
         })
+
         if (error) throw error
-        setMessage('Login successful!')
+        if (!data.session) throw new Error('Login session was not created.')
+
+        setMessage('Login successful! Redirecting...')
+        navigate('/', { replace: true })
       } else {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password
         })
+
         if (error) throw error
 
-        setMessage(
-          data.session
-            ? 'Account created successfully!'
-            : 'Account created! Check your email to confirm it.'
-        )
+        if (data.session) {
+          setMessage('Account created! Redirecting...')
+          navigate('/', { replace: true })
+        } else {
+          setMessage('Account created! Please confirm your email, then log in.')
+        }
       }
     } catch (error) {
-      setMessage(error.message)
+      setMessage(error.message || 'Authentication failed.')
     } finally {
       setLoading(false)
     }
@@ -69,7 +78,7 @@ export default function Auth() {
           type="password"
           required
           minLength={6}
-          placeholder="Password (minimum 6 characters)"
+          placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
           className="w-full p-3 rounded-lg bg-[#222230] border border-white/10 outline-none"
