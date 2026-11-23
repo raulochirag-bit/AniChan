@@ -1,3 +1,4 @@
+import Profile from './Profile'
 import {
   getSavedAnime,
   addSavedAnime,
@@ -41,6 +42,7 @@ function Header() {
       </Link>
 
      <nav>
+  <Link to="/profile">My Profile</Link>
   <Link to="/">Home</Link>
   <Link to="/library">My Library</Link>
   <a href="/#trending">Trending</a>
@@ -340,6 +342,7 @@ function App(){
     <>
       <Header/>
       <Routes>
+        <Route path="/profile" element={<Profile/>}/>
         <Route path="/" element={<Home/>}/>
         <Route path="/login" element={<Auth/>}/>
         <Route path="/library" element={<Library/>}/>
