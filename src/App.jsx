@@ -40,11 +40,12 @@ function Header() {
         Login
       </Link>
 
-      <nav>
-        <Link to="/">Home</Link>
-        <a href="/#trending">Trending</a>
-        <a href="/#popular">Popular</a>
-      </nav>
+     <nav>
+  <Link to="/">Home</Link>
+  <Link to="/library">My Library</Link>
+  <a href="/#trending">Trending</a>
+  <a href="/#popular">Popular</a>
+</nav>
 
       <form className="search" onSubmit={submit}>
         <Search size={18} />
