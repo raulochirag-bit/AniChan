@@ -3,6 +3,7 @@ import {
   addSavedAnime,
   removeSavedAnime
 } from './services/userLibrary'
+import Library from './Library'
 import { supabase } from './services/supabase'
 import Auth from './Auth'
 import { useEffect, useMemo, useState } from 'react'
@@ -327,7 +328,7 @@ function App() {
   return (
     <>
       <Header />
-      <Routes>
+      <<Route path="/library" element={<Library />} />>
         <Route path="/login" element={<Auth />} />
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<SearchPage />} />
