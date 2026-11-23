@@ -373,31 +373,3 @@ function App(){
 
 export default App
 
-function App() {
-  return (
-    <>
-      <Header />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Auth />} />
-        <Route path="/library" element={<Library />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route path="*" element={
-          <div className="page-wrap inner-page">
-            <h1>Page not found</h1>
-            <Link to="/">Return home</Link>
-          </div>
-        } />
-      </Routes>
-
-      <footer>
-        {/* Keep your existing footer content here */}
-      </footer>
-    </>
-  )
-}
-
-export default App
