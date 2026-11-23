@@ -1,3 +1,4 @@
+import { supabase } from './services/supabase'
 import Auth from './Auth'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom'
