@@ -212,28 +212,22 @@ function AnimeDetail(){
  )
 }
 
-
 function App() {
   return (
     <>
       <Header />
-
       <Routes>
         <Route path="/login" element={<Auth />} />
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route
-          path="*"
-          element={
-            <div className="page-wrap inner-page">
-              <h1>Page not found</h1>
-              <Link to="/">Return home</Link>
-            </div>
-          }
-        />
+        <Route path="*" element={
+          <div className="page-wrap inner-page">
+            <h1>Page not found</h1>
+            <Link to="/">Return home</Link>
+          </div>
+        } />
       </Routes>
-
       <footer>
         <Link to="/" className="brand">
           <span className="brand-mark">A</span>
@@ -248,5 +242,4 @@ function App() {
     </>
   )
 }
-
 export default App
