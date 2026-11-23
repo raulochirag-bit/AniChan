@@ -30,11 +30,179 @@ function SearchPage(){
  return <main className="page-wrap inner-page"><h1>Search anime</h1><form className="search big-search" onSubmit={e=>{e.preventDefault();nav(`/search?q=${encodeURIComponent(term)}`);location.href=`/search?q=${encodeURIComponent(term)}`}}><Search/><input value={term} onChange={e=>setTerm(e.target.value)} placeholder="Try Naruto, One Piece..."/><button>Search</button></form>{loading&&<p className="loading">Searching...</p>}{error&&<p className="notice">{error}</p>}{!loading&&<div className="anime-grid">{items.map(a=><AnimeCard key={a.id} anime={a}/>)}</div>}{!loading&&!items.length&&initial&&<p className="muted">No results found. Try another title.</p>}</main>
 }
 function AnimeDetail(){
- const {id}=useParams(),[anime,setAnime]=useState(null),[error,setError]=useState('')
- useEffect(()=>{let live=true;fetchAnimeById(id).then(x=>live&&setAnime(x)).catch(e=>live&&setError(e.message));return()=>{live=false}},[id])
- if(error)return <div className="page-wrap inner-page"><p className="notice">{error}</p><Link to="/">Back home</Link></div>
- if(!anime)return <div className="loading inner-page">Loading anime details...</div>
- return <main><div className="detail-banner" style={{backgroundImage:`linear-gradient(0deg,#090a12,transparent),url(${anime.bannerImage||anime.coverImage?.extraLarge})`}}/><div className="page-wrap detail-layout"><img className="detail-poster" src={anime.coverImage?.extraLarge} alt={titleOf(anime)}/><div className="detail-info"><Link to="/" className="back"><ArrowLeft size={16}/> Home</Link><h1>{titleOf(anime)}</h1><p className="native-title">{anime.title?.native}</p><div className="hero-meta"><span><Star size={15} fill="currentColor"/> {anime.averageScore?(anime.averageScore/10).toFixed(1):'NR'}</span><span>{anime.format}</span><span>{anime.episodes||'?'} episodes</span><span>{anime.seasonYear||'TBA'}</span></div><div className="genres">{anime.genres?.map(g=><span key={g}>{g}</span>)}</div><h3>Synopsis</h3><p className="synopsis">{(anime.description||'No synopsis available.').replace(/<[^>]*>/g,' ')}</p><h3>Information</h3><p className="muted">Status: {anime.status||'Unknown'} · Season: {anime.season||'Unknown'} · Studio: {anime.studios?.nodes?.map(s=>s.name).join(', ')||'Unknown'}</p><div className="notice">AniChan provides anime discovery and metadata. Episodes can be played here only when an administrator adds an official or licensed source.</div></div></div></main>
+ const {id}=useParams()
+ const [anime,setAnime]=useState(null)
+ const [error,setError]=useState('')
+
+ useEffect(()=>{
+  let live=true
+  setAnime(null)
+  setError('')
+
+  fetchAnimeById(id)
+   .then(x=>{if(live)setAnime(x)})
+   .catch(e=>{if(live)setError(e.message)})
+
+  return()=>{live=false}
+ },[id])
+
+ if(error) return (
+  <div className="page-wrap inner-page">
+   <p className="notice">{error}</p>
+   <Link to="/">Back home</Link>
+  </div>
+ )
+
+ if(!anime) return (
+  <div className="loading inner-page">
+   Loading anime details...
+  </div>
+ )
+
+ const title=titleOf(anime)
+ const recommendations=
+  anime.recommendations?.nodes
+   ?.map(x=>x.mediaRecommendation)
+   .filter(Boolean) || []
+
+ const characters=anime.characters?.edges || []
+ const staff=anime.staff?.edges || []
+
+ const heading={
+  marginTop:32,
+  marginBottom:16,
+  fontSize:22
+ }
+
+ const peopleGrid={
+  display:'grid',
+  gridTemplateColumns:'repeat(auto-fill,minmax(125px,1fr))',
+  gap:16
+ }
+
+ const personCard={
+  background:'#171725',
+  borderRadius:12,
+  overflow:'hidden',
+  textAlign:'center',
+  paddingBottom:12
+ }
+
+ return (
+  <main>
+   <div className="detail-banner"
+    style={{
+     backgroundImage:`linear-gradient(0deg,#090a12,transparent),url(${anime.bannerImage||anime.coverImage?.extraLarge})`
+    }}
+   />
+
+   <div className="page-wrap detail-layout">
+    <img
+     className="detail-poster"
+     src={anime.coverImage?.extraLarge}
+     alt={title}
+    />
+
+    <div className="detail-info">
+     <Link to="/" className="back">
+      <ArrowLeft size={16}/> Home
+     </Link>
+
+     <h1>{title}</h1>
+     <p className="native-title">
+      {anime.title?.native}
+     </p>
+
+     <div className="hero-meta">
+      <span>
+       <Star size={15} fill="currentColor"/>
+       {anime.averageScore
+        ? (anime.averageScore/10).toFixed(1)
+        : 'NR'}
+      </span>
+      <span>{anime.format}</span>
+      <span>{anime.episodes || '?'} episodes</span>
+      <span>{anime.seasonYear || 'TBA'}</span>
+     </div>
+
+     <div className="genres">
+      {anime.genres?.map(g=>
+       <span key={g}>{g}</span>
+      )}
+     </div>
+
+     <h3 style={heading}>Synopsis</h3>
+     <p className="synopsis">
+      {(anime.description||'No synopsis available.')
+       .replace(/<[^>]*>/g,' ')}
+     </p>
+
+     <h3 style={heading}>Information</h3>
+     <p className="muted">
+      Status: {anime.status||'Unknown'} ·
+      Season: {anime.season||'Unknown'} ·
+      Studio: {anime.studios?.nodes?.map(s=>s.name).join(', ')||'Unknown'}
+     </p>
+
+     <div className="notice">
+      Episodes are available only through official or licensed sources.
+     </div>
+
+     {characters.length>0 && <>
+      <h2 style={heading}>Characters & Voice Actors</h2>
+      <div style={peopleGrid}>
+       {characters.map((edge,i)=>(
+        <div style={personCard} key={edge.node.id}>
+         <img
+          src={edge.node.image?.large}
+          alt={edge.node.name.full}
+          style={{width:'100%',height:155,objectFit:'cover'}}
+         />
+         <div style={{padding:8}}>
+          <strong>{edge.node.name.full}</strong>
+          <p className="muted">{edge.role}</p>
+          {edge.voiceActors?.[0] && <>
+           <small>Japanese VA</small>
+           <p>{edge.voiceActors[0].name.full}</p>
+          </>}
+         </div>
+        </div>
+       ))}
+      </div>
+     </>}
+
+     {staff.length>0 && <>
+      <h2 style={heading}>Production Staff</h2>
+      <div style={peopleGrid}>
+       {staff.map(edge=>(
+        <div style={personCard} key={edge.node.id}>
+         <img
+          src={edge.node.image?.large}
+          alt={edge.node.name.full}
+          style={{width:'100%',height:155,objectFit:'cover'}}
+         />
+         <div style={{padding:8}}>
+          <strong>{edge.node.name.full}</strong>
+          <p className="muted">{edge.role}</p>
+         </div>
+        </div>
+       ))}
+      </div>
+     </>}
+
+     {recommendations.length>0 && <>
+      <h2 style={heading}>You May Also Like</h2>
+      <div className="anime-grid">
+       {recommendations.map(a=>(
+        <AnimeCard key={a.id} anime={a}/>
+       ))}
+      </div>
+     </>}
+    </div>
+   </div>
+  </main>
+ )
 }
+
 function App(){return <><Header/><Routes><Route path="/" element={<Home/>}/><Route path="/search" element={<SearchPage/>}/><Route path="/anime/:id" element={<AnimeDetail/>}/><Route path="*" element={<div className="page-wrap inner-page"><h1>Page not found</h1><Link to="/">Return home</Link></div>}/></Routes><footer><Link to="/" className="brand"><span className="brand-mark">A</span>Ani<span>Chan</span></Link><p>Discover anime. Find your next adventure.</p><small>Anime metadata provided by AniList and Jikan. AniChan is an independent discovery project.</small></footer></>}
 export default App
