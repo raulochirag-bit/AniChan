@@ -10,7 +10,14 @@ function Header(){
  const [term,setTerm]=useState(''), [open,setOpen]=useState(false)
  const nav=useNavigate()
  function submit(e){e.preventDefault(); if(term.trim()) nav(`/search?q=${encodeURIComponent(term.trim())}`)}
- return <header className="header"><Link to="/" className="brand"><span className="brand-mark">A</span>Ani<span>Chan</span></Link><nav><Link to="/">Home</Link><a href="/#trending">Trending</a><a href="/#popular">Popular</a></nav><form className="search" onSubmit={submit}><Search size={18}/><input value={term} onChange={e=>setTerm(e.target.value)} placeholder="Search anime..."/><button>Search</button></form><button className="mobile-menu" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open?<X/>:<Menu/>}</button>{open&&<div className="mobile-links"><Link to="/" onClick={()=>setOpen(false)}>Home</Link><a href="/#trending">Trending</a><a href="/#popular">Popular</a></div>}</header>
+ return <header className="header"><Link to="/" className="brand"><span className="brand-mark">A</span>Ani<span>Chan</span></Link></Link>
+<Link
+  to="/login"
+  className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold"
+>
+  Login
+</Link>
+<nav><nav><Link to="/">Home</Link><a href="/#trending">Trending</a><a href="/#popular">Popular</a></nav><form className="search" onSubmit={submit}><Search size={18}/><input value={term} onChange={e=>setTerm(e.target.value)} placeholder="Search anime..."/><button>Search</button></form><button className="mobile-menu" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open?<X/>:<Menu/>}</button>{open&&<div className="mobile-links"><Link to="/" onClick={()=>setOpen(false)}>Home</Link><a href="/#trending">Trending</a><a href="/#popular">Popular</a></div>}</header>
 }
 function AnimeCard({anime}){
  return <Link className="anime-card" to={`/anime/${anime.id}`}><div className="poster-wrap"><img src={anime.coverImage?.large || anime.coverImage?.extraLarge} alt={titleOf(anime)} loading="lazy"/><span className="score"><Star size={12} fill="currentColor"/> {anime.averageScore ? (anime.averageScore/10).toFixed(1):'NR'}</span><span className="card-hover"><Play fill="currentColor"/></span></div><div className="card-title">{titleOf(anime)}</div><div className="muted">{anime.format || 'Anime'} {anime.seasonYear ? `• ${anime.seasonYear}`:''}</div></Link>
