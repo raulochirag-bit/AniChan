@@ -30,6 +30,7 @@ function Header() {
 
   return (
     <header className="header">
+      <Link to="/admin">Admin Panel</Link>
       <Link to="/" className="brand">
         <span className="brand-mark">A</span>
         Ani<span>Chan</span>
