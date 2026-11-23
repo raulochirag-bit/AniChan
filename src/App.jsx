@@ -1,3 +1,4 @@
+import Auth from './Auth'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { Search, Play, BookmarkPlus, Star, Flame, Compass, Menu, X, ChevronRight, ArrowLeft } from 'lucide-react'
@@ -204,5 +205,5 @@ function AnimeDetail(){
  )
 }
 
-function App(){return <><Header/><Routes><Route path="/" element={<Home/>}/><Route path="/search" element={<SearchPage/>}/><Route path="/anime/:id" element={<AnimeDetail/>}/><Route path="*" element={<div className="page-wrap inner-page"><h1>Page not found</h1><Link to="/">Return home</Link></div>}/></Routes><footer><Link to="/" className="brand"><span className="brand-mark">A</span>Ani<span>Chan</span></Link><p>Discover anime. Find your next adventure.</p><small>Anime metadata provided by AniList and Jikan. AniChan is an independent discovery project.</small></footer></>}
+function App(){return <><Header/><<Route path="/login" element={<Auth />} />><Route path="/" element={<Home/>}/><Route path="/search" element={<SearchPage/>}/><Route path="/anime/:id" element={<AnimeDetail/>}/><Route path="*" element={<div className="page-wrap inner-page"><h1>Page not found</h1><Link to="/">Return home</Link></div>}/></Routes><footer><Link to="/" className="brand"><span className="brand-mark">A</span>Ani<span>Chan</span></Link><p>Discover anime. Find your next adventure.</p><small>Anime metadata provided by AniList and Jikan. AniChan is an independent discovery project.</small></footer></>}
 export default App
