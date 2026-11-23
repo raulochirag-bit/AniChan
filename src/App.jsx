@@ -1,3 +1,8 @@
+import {
+  getSavedAnime,
+  addSavedAnime,
+  removeSavedAnime
+} from './services/userLibrary'
 import { supabase } from './services/supabase'
 import Auth from './Auth'
 import { useEffect, useMemo, useState } from 'react'
@@ -88,9 +93,49 @@ function SearchPage(){
  return <main className="page-wrap inner-page"><h1>Search anime</h1><form className="search big-search" onSubmit={e=>{e.preventDefault();nav(`/search?q=${encodeURIComponent(term)}`);location.href=`/search?q=${encodeURIComponent(term)}`}}><Search/><input value={term} onChange={e=>setTerm(e.target.value)} placeholder="Try Naruto, One Piece..."/><button>Search</button></form>{loading&&<p className="loading">Searching...</p>}{error&&<p className="notice">{error}</p>}{!loading&&<div className="anime-grid">{items.map(a=><AnimeCard key={a.id} anime={a}/>)}</div>}{!loading&&!items.length&&initial&&<p className="muted">No results found. Try another title.</p>}</main>
 }
 function AnimeDetail(){
+  useEffect(()=>{
+  let live=true
+
+  Promise.all([
+    getSavedAnime('watchlist'),
+    getSavedAnime('favourites')
+  ]).then(([watchlist,favourites])=>{
+    if(live){
+      setWatchlisted(watchlist.includes(Number(id)))
+      setFavourited(favourites.includes(Number(id)))
+    }
+  }).catch(()=>{})
+
+  return ()=>{live=false}
+},[id])
+
+async function toggleSaved(type){
+  try{
+    const saved = type==='watchlist' ? watchlisted : favourited
+
+    if(saved){
+      await removeSavedAnime(type,id)
+    }else{
+      await addSavedAnime(type,id)
+    }
+
+    if(type==='watchlist'){
+      setWatchlisted(!saved)
+    }else{
+      setFavourited(!saved)
+    }
+
+    setSaveMessage('Saved successfully!')
+  }catch(e){
+    setSaveMessage(e.message || 'Please log in first.')
+  }
+}
  const {id}=useParams()
  const [anime,setAnime]=useState(null)
  const [error,setError]=useState('')
+  const [watchlisted,setWatchlisted]=useState(false)
+const [favourited,setFavourited]=useState(false)
+const [saveMessage,setSaveMessage]=useState('')
 
  useEffect(()=>{
   let live=true
@@ -201,7 +246,23 @@ function AnimeDetail(){
       Season: {anime.season||'Unknown'} ·
       Studio: {anime.studios?.nodes?.map(s=>s.name).join(', ')||'Unknown'}
      </p>
+<div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'20px 0'}}>
+  <button
+    onClick={()=>toggleSaved('watchlist')}
+    className="px-5 py-3 rounded-lg bg-purple-600 text-white font-semibold"
+  >
+    {watchlisted ? '✓ In Watchlist' : '+ Add to Watchlist'}
+  </button>
 
+  <button
+    onClick={()=>toggleSaved('favourites')}
+    className="px-5 py-3 rounded-lg bg-pink-600 text-white font-semibold"
+  >
+    {favourited ? '♥ Favourited' : '♡ Add to Favourites'}
+  </button>
+</div>
+
+{saveMessage && <p className="notice">{saveMessage}</p>}
      <div className="notice">
       Episodes are available only through official or licensed sources.
      </div>
