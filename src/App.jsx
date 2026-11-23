@@ -1,3 +1,4 @@
+import Admin from './Admin'
 import Profile from './Profile'
 import {
   getSavedAnime,
@@ -342,6 +343,7 @@ function App(){
     <>
       <Header/>
       <Routes>
+        <Route path="/admin" element={<Admin />} />
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/" element={<Home/>}/>
         <Route path="/login" element={<Auth/>}/>
